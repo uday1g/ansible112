@@ -4,6 +4,13 @@
   tasks: 
     - name: install apache2
       ansible.builtin.apt:
-        name: apache2
+        name: 
+          - apache2
+          - php
+          - libapache2-mod-php
         state: present
         update_cache: yes
+    - name: copy file
+      ansible.builtin.copy:
+        content: "<?php phpinfo();?>"
+        dest: /var/www/html/info.php
