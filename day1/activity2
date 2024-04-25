@@ -21,8 +21,39 @@
         name: tomcat
     - name: copy url
       ansible.builtin.unarchive:
-        url: https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.23/bin/apache-tomcat-10.1.23.tar.gz
-        dest: /opt/tomcat
+        src: https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.23/bin/apache-tomcat-10.1.23.tar.gz
+        create: /opt/tomcat/apache-tomcat-10.1.23
         remote_src: yes
+        dest: /opt/tomcat 
         group: tomcat
-~                                                                                                                       
+~   - name: symbolic link
+      ansible.builtin.file:
+        group: tomcat
+        path: /opt/tomcat/latest
+        src: /opt/tomcat/apache-tomcat-10.1.23
+        state: link                                                                             
+        owner: tomcat
+    - name: giving permission
+      ansible.builtin.file:
+        group: tomcat
+        owner: tomcat
+        path: /opt/tomcat
+        mode: '0755'
+        state: directory
+    - name: changing permissions
+      ansible.builtin.command: sudo sh -c 'chmod +x /opt/tomcat/latest/bin/*.sh'
+    - name: recusily change permissions
+      ansible.builtin.file:
+        path: /opt/tomcat
+        state: directory
+        recurse: true
+        group: tomcat
+        owner: tomcat
+        register: shell_files
+    - name: print the value
+      ansible.builtin.debug:
+        var: shell_files
+    - name: print each file
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ shell_files.stdout_lines }}"
