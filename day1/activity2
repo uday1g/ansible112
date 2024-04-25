@@ -1,0 +1,28 @@
+- name: install tomcat
+  become: yes
+  hosts: all
+  tasks:
+    - name: install java
+      ansible.builtin.apt:
+        name: openjdk-11-jdk
+        state: present
+        update_cache: yes
+    - name: add user
+      ansible.builtin.user:
+        shell: /bin/false
+        groups: tomcat
+        home: tomcat
+        state: present
+        system: true
+        create_home: true
+    - name: ensure some group exists
+      ansible.builtin.group:
+        state: present
+        name: tomcat
+    - name: copy url
+      ansible.builtin.unarchive:
+        url: https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.23/bin/apache-tomcat-10.1.23.tar.gz
+        dest: /opt/tomcat
+        remote_src: yes
+        group: tomcat
+~                                                                                                                       
